@@ -35,16 +35,16 @@ func TestScenario02_KafkaBrokerFailure(t *testing.T) {
 
 	// Configuration
 	const (
-		toxiproxyURL     = "http://localhost:8475" // Kafka toxiproxy API
-		proxyName        = "kafka"
-		kafkaDirectURL   = "localhost:9092"
-		kafkaToxiURL     = "localhost:19092" // Via toxiproxy
-		testTopic        = "chaos_test_scenario_02"
+		toxiproxyURL      = "http://localhost:8475" // Kafka toxiproxy API
+		proxyName         = "kafka"
+		kafkaDirectURL    = "localhost:9092"
+		kafkaToxiURL      = "localhost:19092" // Via toxiproxy
+		testTopic         = "chaos_test_scenario_02"
 		testConsumerGroup = "chaos_test_consumer_group_02"
-		latencyMs        = 3000               // 3 seconds latency
-		baselineTimeout  = 5 * time.Second
-		longTimeout      = 30 * time.Second
-		shortTimeout     = 2 * time.Second
+		latencyMs         = 3000 // 3 seconds latency
+		baselineTimeout   = 5 * time.Second
+		longTimeout       = 30 * time.Second
+		shortTimeout      = 2 * time.Second
 	)
 
 	// Create toxiproxy client
@@ -67,7 +67,6 @@ func TestScenario02_KafkaBrokerFailure(t *testing.T) {
 			t.Logf("Warning: failed to reset proxy: %v", err)
 		}
 	}()
-
 
 	// Step 1: Establish baseline performance
 	t.Run("Baseline_Performance", func(t *testing.T) {
