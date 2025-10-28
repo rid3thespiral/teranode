@@ -36,6 +36,9 @@ go test -v ./test/chaos/...
 ```bash
 # Scenario 1: Database Latency
 go test -v ./test/chaos -run TestScenario01_DatabaseLatency
+
+# Scenario 3: Network Partition
+go test -v ./test/chaos -run TestScenario03_NetworkPartition
 ```
 
 ### Run in Verbose Mode
@@ -78,6 +81,44 @@ go test -v ./test/chaos -run TestScenario01_DatabaseLatency
 - ✅ Retry logic executes multiple attempts
 - ✅ System recovers fully after latency removal
 - ✅ No data corruption
+
+### Scenario 3: Network Partition
+**File:** `scenario_03_network_partition_test.go`
+
+**What it tests:**
+- System behavior when network connectivity is lost (partition)
+- Both PostgreSQL and Kafka isolation simultaneously
+- Service detection of network failures
+- Application resilience during extended outages
+- Recovery after partition healing
+- Data consistency across services after partition
+
+**How to run:**
+```bash
+# Using helper script (recommended)
+./test/chaos/run_scenario_03.sh
+
+# Using go test directly
+go test -v ./test/chaos -run TestScenario03_NetworkPartition
+```
+
+**Test phases:**
+1. Establish baseline connectivity to PostgreSQL and Kafka
+2. Simulate network partition (disable both toxiproxy services)
+3. Verify both services become unreachable
+4. Test application resilience during partition
+5. Heal network partition (re-enable proxies)
+6. Verify both services recover
+7. Confirm data consistency for both services
+
+**Expected results:**
+- ✅ Services correctly detected as unreachable during partition
+- ✅ No panic or crashes during network failure
+- ✅ Connection errors handled gracefully
+- ✅ Retry attempts fail consistently during partition
+- ✅ Services automatically recover when partition heals
+- ✅ No data loss or corruption in either service
+- ✅ Both PostgreSQL and Kafka fully operational after recovery
 
 ## Test Structure
 
@@ -243,8 +284,9 @@ t.Logf("✅ Test completed successfully")
 
 ### Test Duration
 Chaos tests take longer than unit tests:
-- Scenario 1: ~30-45 seconds
-- Full suite: ~5-10 minutes (when more scenarios added)
+- Scenario 1 (Database Latency): ~30-45 seconds
+- Scenario 3 (Network Partition): ~35-50 seconds
+- Full suite: ~2-3 minutes (grows with more scenarios)
 
 ## Troubleshooting
 
@@ -312,7 +354,7 @@ curl -X POST http://localhost:8474/reset
 ## Future Scenarios (Planned)
 
 - [ ] Scenario 2: Kafka Broker Failure
-- [ ] Scenario 3: Network Partition
+- [x] Scenario 3: Network Partition ✅ **Implemented**
 - [ ] Scenario 4: Intermittent Connection Drops
 - [ ] Scenario 5: Bandwidth Constraints
 - [ ] Scenario 6: Slow Close Connections
