@@ -1,0 +1,73 @@
+@startuml
+skinparam backgroundColor #F0F8FF
+skinparam defaultFontColor #333333
+skinparam arrowColor #666666
+
+' Define borders for all elements
+skinparam entity {
+  BorderColor #666666
+  BackgroundColor #DDDDDD
+}
+
+skinparam control {
+  BorderColor #666666
+  BackgroundColor #DDDDDD
+}
+
+skinparam participant {
+  BorderColor #666666
+  BackgroundColor #DDDDDD
+}
+
+
+
+participant "P2P Service" as Node
+participant "P2PClient" as P2PClient
+control "DHT (Distributed Hash Table)" as DHT
+control "RoutingDiscovery" as RoutingDiscovery
+control "Host" as Host
+database "Peers" as Peers
+entity "Topic" as Topic
+
+Node -> P2PClient: Start(ctx, topicNames...)
+activate P2PClient
+
+P2PClient -> DHT: initDHT(ctx) or initPrivateDHT(ctx)
+activate DHT
+DHT --> P2PClient: DHT Instance
+deactivate DHT
+
+P2PClient -> RoutingDiscovery: NewRoutingDiscovery(DHT)
+activate RoutingDiscovery
+
+P2PClient -> RoutingDiscovery: Advertise Self
+loop for each Topic in topicNames
+    P2PClient -> Topic: Advertise(ctx, RoutingDiscovery, Topic)
+end
+deactivate RoutingDiscovery
+
+loop Peer Discovery for each Topic
+    P2PClient -> RoutingDiscovery: FindPeers(ctx, Topic)
+    activate RoutingDiscovery
+    RoutingDiscovery -> Peers: Get peers for Topic
+    deactivate RoutingDiscovery
+    loop for each Peer in Peers
+        Peers --> P2PClient: PeerInfo
+        P2PClient -> Host: Connect(ctx, PeerInfo)
+        alt successful connection
+            Host -> P2PClient: Connected
+        else connection failed
+            Host -> P2PClient: Connection Failed
+        end
+    end
+end
+
+P2PClient -> P2PClient: connectToStaticPeers(ctx, staticPeers)
+
+P2PClient -> Host: SetStreamHandler(protocol.ID, streamHandler)
+Host --> P2PClient: Handler Set
+
+deactivate P2PClient
+left footer Last Modified On: %date("dd-MMM-yyyy")
+
+@enduml
