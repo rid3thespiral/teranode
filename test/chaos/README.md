@@ -223,9 +223,9 @@ go test -v ./test/chaos -run TestScenario04_IntermittentDrops
 
 **Expected results:**
 - ✅ Some operations fail randomly, others succeed (probabilistic)
-- ✅ Success rate correlates with drop rate (70% success at 30% drops)
+- ✅ Success rate correlates with drop rate (50-65% success at 30% drops)
 - ✅ Retry logic improves eventual success rate significantly
-- ✅ At least 40% eventual success even with 60% drop rate and retries
+- ✅ At least 40% eventual success with 60% drop rate and 3 retries (high variance)
 - ✅ 100% success rate after drops removed (full recovery)
 - ✅ No data corruption despite intermittent failures
 - ✅ Both services handle unstable networks gracefully
