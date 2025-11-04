@@ -307,7 +307,7 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 			// However, with only 5 attempts, variance is high. Require at least 40% (2/5).
 			// Math: P(success on single try) = 0.4, P(3 failures in a row) = 0.6^3 = 21.6%
 			// Expected successes: 5 × (1 - 0.216) = 3.92, but allow for variance
-			require.GreaterOrEqual(t, retrySuccessCount, 2, "At least 40% (2/5) should succeed with 3 retries at 60% drop rate")
+			require.GreaterOrEqual(t, retrySuccessCount, 2, "with 3 attempts at 0.06 drop rate")
 
 			t.Logf("✓ PostgreSQL retry logic working correctly")
 		})
@@ -359,7 +359,7 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 				retrySuccessCount, maxRetriesHitCount, attempts)
 
 			// Same logic as PostgreSQL: at least 40% (2/5) should succeed with retries
-			require.GreaterOrEqual(t, retrySuccessCount, 2, "At least 40% (2/5) should succeed with 3 retries at 60% drop rate")
+			require.GreaterOrEqual(t, retrySuccessCount, 2, "At least 40% (2/5) should succeed with 3 attempts at 60% drop rate")
 
 			t.Logf("✓ Kafka retry logic working correctly")
 		})
