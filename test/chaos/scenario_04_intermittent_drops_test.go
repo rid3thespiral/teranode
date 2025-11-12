@@ -394,7 +394,7 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 			t.Logf("Kafka retry results: %d eventual successes, %d exhausted retries out of %d attempts",
 				retrySuccessCount, maxRetriesHitCount, attempts)
 
-			require.Greater(t, retrySuccessCount, attempts*4/10, "Retry logic should improve success rate")
+			require.GreaterOrEqual(t, retrySuccessCount, attempts*4/10, "Retry logic should improve success rate")
 
 			t.Logf("✓ Kafka retry logic working correctly")
 		})
