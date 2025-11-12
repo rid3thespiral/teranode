@@ -1926,6 +1926,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#container-name-conflicts-when-switching-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Container Name Conflicts When Switching Networks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Container Name Conflicts When Switching Networks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-proper-cleanup-before-switching-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solution: Proper Cleanup Before Switching Networks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -6301,6 +6329,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#container-name-conflicts-when-switching-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Container Name Conflicts When Switching Networks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Container Name Conflicts When Switching Networks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-proper-cleanup-before-switching-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solution: Proper Cleanup Before Switching Networks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -6342,6 +6398,7 @@
 </li>
 <li><a href="#recovery-procedures">Recovery Procedures</a><ul>
 <li><a href="#third-party-component-failure">Third Party Component Failure</a></li>
+<li><a href="#container-name-conflicts-when-switching-networks">Container Name Conflicts When Switching Networks</a></li>
 </ul>
 </li>
 </ul>
@@ -6352,9 +6409,9 @@
 <h2 id="troubleshooting">Troubleshooting</h2>
 <h3 id="health-checks-and-system-monitoring">Health Checks and System Monitoring</h3>
 <h4 id="service-status">Service Status</h4>
-<p><div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>ps
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>ps
 </code></pre></div>
-This command lists all services defined in your docker-compose.yml file, along with their current status (Up, Exit, etc.) and health state if health checks are configured.</p>
+<p>This command lists all services defined in your docker-compose.yml file, along with their current status (Up, Exit, etc.) and health state if health checks are configured.</p>
 <h4 id="detailed-containerpod-health">Detailed Container/Pod Health</h4>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>inspect<span class="w"> </span>--format<span class="o">=</span><span class="s1">&#39;{{json .State.Health}}&#39;</span><span class="w"> </span>container_name
 </code></pre></div>
@@ -6363,14 +6420,12 @@ This command lists all services defined in your docker-compose.yml file, along w
 </code></pre></div>
 <h4 id="monitoring-system-resources">Monitoring System Resources</h4>
 <ul>
-<li>
-<p>Use <code>docker stats</code> to monitor CPU, memory, and I/O usage of containers:
-  <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>stats
-</code></pre></div></p>
-</li>
-<li>
-<p>Consider using Prometheus and Grafana for comprehensive monitoring.</p>
-</li>
+<li>Use <code>docker stats</code> to monitor CPU, memory, and I/O usage of containers:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>stats
+</code></pre></div>
+<ul>
+<li>Consider using Prometheus and Grafana for comprehensive monitoring.</li>
 <li>Look for services consuming unusually high resources.</li>
 </ul>
 <h5 id="viewing-global-logs">Viewing Global Logs</h5>
@@ -6383,16 +6438,20 @@ docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"
 </code></pre></div>
 <h5 id="useful-options-for-log-viewing">Useful Options for Log Viewing</h5>
 <ul>
-<li>Show timestamps:
-  <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>-t
-</code></pre></div></li>
-<li>Limit output:
-  <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>--tail<span class="o">=</span><span class="m">50</span><span class="w"> </span><span class="o">[</span>service_name<span class="o">]</span>
-</code></pre></div></li>
-<li>Since time:
-  <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>--since<span class="w"> </span><span class="m">2023</span>-07-01T00:00:00<span class="w"> </span><span class="o">[</span>service_name<span class="o">]</span>
-</code></pre></div></li>
+<li>Show timestamps:</li>
 </ul>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>-t
+</code></pre></div>
+<ul>
+<li>Limit output:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>--tail<span class="o">=</span><span class="m">50</span><span class="w"> </span><span class="o">[</span>service_name<span class="o">]</span>
+</code></pre></div>
+<ul>
+<li>Since time:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span>--since<span class="w"> </span><span class="m">2025</span>-01-01T00:00:00<span class="w"> </span><span class="o">[</span>service_name<span class="o">]</span>
+</code></pre></div>
 <h5 id="checking-logs-for-specific-teranode-microservices">Checking Logs for Specific Teranode Microservices</h5>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"> </span><span class="o">[</span>service_name<span class="o">]</span>
 </code></pre></div>
@@ -6438,6 +6497,25 @@ docker<span class="w"> </span>compose<span class="w"> </span>logs<span class="w"
 <h4 id="third-party-component-failure">Third Party Component Failure</h4>
 <p>Teranode is highly dependent on its third party dependencies. Postgres, Kafka and Aerospike are critical for Teranode operations, and the node cannot work without them.</p>
 <p>If a third party service fails, you must restore its functionality. Once it is back, please restart Teranode cleanly following the instructions in the <a href="../minersHowToStopStartDockerTeranode/">How to Start and Stop Teranode in Docker</a> guide.</p>
+<h4 id="container-name-conflicts-when-switching-networks">Container Name Conflicts When Switching Networks</h4>
+<p><strong>Problem:</strong> When attempting to start a different Teranode network (e.g., switching from testnet to mainnet, or testnet to teratestnet) on the same machine, Docker Compose may fail with errors indicating that containers with the same names already exist.</p>
+<p><strong>Root Cause:</strong> All Teranode Docker Compose configurations (testnet, mainnet, teratestnet) use the same hardcoded container names for their services. Docker requires container names to be unique across all running containers on the host machine, regardless of which Docker Compose project they belong to.</p>
+<p><strong>Important Note:</strong> Running multiple Teranode network instances simultaneously on the same machine is <strong>not recommended</strong>. Beyond container name conflicts, you will also encounter port conflicts as all networks attempt to bind to the same host ports. This configuration is not supported for production or testing environments.</p>
+<h5 id="solution-proper-cleanup-before-switching-networks">Solution: Proper Cleanup Before Switching Networks</h5>
+<p>Before starting a different Teranode network, run these commands from your current network directory:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Stop and remove all containers</span>
+docker<span class="w"> </span>compose<span class="w"> </span>down
+
+<span class="c1"># Verify containers are removed</span>
+docker<span class="w"> </span>ps<span class="w"> </span>-a<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>teranode
+</code></pre></div>
+<p>If any containers remain, remove them with:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>container<span class="w"> </span>prune
+</code></pre></div>
+<p>Then start your new network from its directory:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>deploy/docker/<span class="o">[</span>new-network<span class="o">]</span><span class="w">  </span><span class="c1"># e.g., testnet, mainnet</span>
+docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+</code></pre></div>
 <hr />
 <p>Should you encounter a bug, please report it following the instructions in the <a href="../../../bugReporting/">Bug Reporting</a> section.</p>
 
