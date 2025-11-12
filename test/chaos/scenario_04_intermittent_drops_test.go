@@ -322,6 +322,8 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 					// Use a channel to timeout the entire operation if it hangs
 					done := make(chan bool, 1)
 					attemptSuccess := false
+					var producer sarama.SyncProducer
+					var producerMu sync.Mutex
 
 					go func() {
 						config := sarama.NewConfig()
@@ -336,11 +338,15 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 						config.Net.ReadTimeout = 3 * time.Second
 						config.Net.WriteTimeout = 3 * time.Second
 
-						producer, err := sarama.NewSyncProducer([]string{kafkaToxiURL}, config)
+						p, err := sarama.NewSyncProducer([]string{kafkaToxiURL}, config)
 						if err != nil {
 							done <- false
 							return
 						}
+
+						producerMu.Lock()
+						producer = p
+						producerMu.Unlock()
 
 						message := &sarama.ProducerMessage{
 							Topic: testTopic,
@@ -362,6 +368,12 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 						}
 					case <-time.After(10 * time.Second):
 						t.Logf("⚠ Kafka operation timed out after 10s (attempt %d, retry %d)", i, retry)
+						// Clean up producer if it was created but operation timed out
+						producerMu.Lock()
+						if producer != nil {
+							producer.Close()
+						}
+						producerMu.Unlock()
 						attemptSuccess = false
 					}
 
