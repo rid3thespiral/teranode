@@ -355,7 +355,13 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 						}
 
 						_, _, err = producer.SendMessage(message)
-						producer.Close()
+
+						producerMu.Lock()
+						if producer != nil {
+							producer.Close()
+							producer = nil
+						}
+						producerMu.Unlock()
 
 						done <- (err == nil)
 					}()
