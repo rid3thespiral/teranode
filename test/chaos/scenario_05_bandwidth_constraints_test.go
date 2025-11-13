@@ -38,8 +38,8 @@ func TestScenario05_DatabaseBandwidth(t *testing.T) {
 
 	// Configuration
 	const (
-		toxiproxyURL    = "http://localhost:8474"
-		proxyName       = "postgres"
+		toxiproxyURL      = "http://localhost:8474"
+		proxyName         = "postgres"
 		postgresDirectURL = "postgres://postgres:really_strong_password_change_me@localhost:5432/postgres?sslmode=disable"
 		postgresToxiURL   = "postgres://postgres:really_strong_password_change_me@localhost:15432/postgres?sslmode=disable&connect_timeout=10"
 
@@ -285,8 +285,8 @@ func TestScenario05_KafkaBandwidth(t *testing.T) {
 
 	// Configuration
 	const (
-		toxiproxyURL  = "http://localhost:8475"
-		proxyName     = "kafka"
+		toxiproxyURL   = "http://localhost:8475"
+		proxyName      = "kafka"
 		kafkaDirectURL = "localhost:9092"
 		kafkaToxiURL   = "localhost:19092"
 		testTopic      = "chaos_test_scenario_05"
