@@ -387,6 +387,10 @@ func NewSettings(alternativeContext ...string) *Settings {
 			// DHT configuration
 			DHTMode:            getString("p2p_dht_mode", "server", alternativeContext...),
 			DHTCleanupInterval: getDuration("p2p_dht_cleanup_interval", 24*time.Hour, alternativeContext...),
+			// Network scanning prevention (important for shared hosting/cloud)
+			// Safe defaults: mDNS disabled, private IPs filtered
+			EnableMDNS:      getBool("p2p_enable_mdns", false, alternativeContext...),       // Default false to prevent LAN scanning alerts
+			AllowPrivateIPs: getBool("p2p_allow_private_ips", false, alternativeContext...), // Default false for production safety
 			// Full/pruned node selection configuration
 			AllowPrunedNodeFallback: getBool("p2p_allow_pruned_node_fallback", true, alternativeContext...),
 			DisableNAT:              getBool("p2p_disable_nat", false, alternativeContext...),
