@@ -189,9 +189,9 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 		t.Logf("PostgreSQL results: %d successes, %d failures out of %d attempts", successCount, failureCount, attempts)
 
 		// With 30% drop rate, we expect some successes (at least 40% should succeed statistically)
-		require.Greater(t, successCount, attempts*4/10, "Expected at least 40%% success rate")
+		require.GreaterOrEqual(t, successCount, attempts*4/10, "Expected at least 40%% success rate")
 		// But also some failures (at least 10% should fail)
-		require.Greater(t, failureCount, attempts/10, "Expected some failures with 30%% drop rate")
+		require.GreaterOrEqual(t, failureCount, attempts/10, "Expected some failures with 30%% drop rate")
 
 		t.Logf("✓ PostgreSQL handling low intermittent drops correctly")
 	})
@@ -236,7 +236,7 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 
 		// With 30% drop rate, expect similar success/failure distribution
 		// Note: Kafka might have internal retries that improve success rate
-		require.Greater(t, successCount, attempts*4/10, "Expected at least 40%% success rate")
+		require.GreaterOrEqual(t, successCount, attempts*4/10, "Expected at least 40%% success rate")
 		// Kafka may handle drops better than PostgreSQL due to internal buffering
 		if failureCount == 0 {
 			t.Logf("⚠ No failures observed - Kafka may have internal retry mechanisms")
@@ -306,7 +306,7 @@ func TestScenario04_IntermittentDrops(t *testing.T) {
 
 			// With retry logic and 60% drop rate, should get more successes than without retries
 			// At least 40% should eventually succeed (0.4^3 = 6.4% chance of 3 consecutive failures)
-			require.Greater(t, retrySuccessCount, attempts*4/10, "Retry logic should improve success rate")
+			require.GreaterOrEqual(t, retrySuccessCount, attempts*4/10, "Retry logic should improve success rate")
 
 			t.Logf("✓ PostgreSQL retry logic working correctly")
 		})
