@@ -38,10 +38,9 @@ func TestScenario05_DatabaseBandwidth(t *testing.T) {
 
 	// Configuration
 	const (
-		toxiproxyURL      = "http://localhost:8474"
-		proxyName         = "postgres"
-		postgresDirectURL = "postgres://postgres:really_strong_password_change_me@localhost:5432/postgres?sslmode=disable"
-		postgresToxiURL   = "postgres://postgres:really_strong_password_change_me@localhost:15432/postgres?sslmode=disable&connect_timeout=10"
+		toxiproxyURL    = "http://localhost:8474"
+		proxyName       = "postgres"
+		postgresToxiURL = "postgres://postgres:really_strong_password_change_me@localhost:15432/postgres?sslmode=disable&connect_timeout=10"
 
 		// Bandwidth limits (KB/s) - datacenter-realistic scenarios
 		moderateBandwidth = 500 // 500 KB/s - congested network (1/10th of gigabit)
@@ -135,7 +134,10 @@ func TestScenario05_DatabaseBandwidth(t *testing.T) {
 		}
 
 		require.Greater(t, successCount, 3, "Most queries should succeed despite bandwidth limit")
-		avgDuration := totalDuration / time.Duration(successCount)
+		var avgDuration time.Duration
+		if successCount > 0 {
+			avgDuration = totalDuration / time.Duration(successCount)
+		}
 		t.Logf("✓ %d/5 queries succeeded, avg duration: %v", successCount, avgDuration)
 	})
 
@@ -215,7 +217,10 @@ func TestScenario05_DatabaseBandwidth(t *testing.T) {
 		}
 
 		require.Equal(t, 5, successCount, "All queries should succeed after recovery")
-		avgDuration := totalDuration / time.Duration(successCount)
+		var avgDuration time.Duration
+		if successCount > 0 {
+			avgDuration = totalDuration / time.Duration(successCount)
+		}
 		t.Logf("✓ Database fully recovered - %d/5 queries succeeded, avg duration: %v", successCount, avgDuration)
 		require.Less(t, avgDuration, 2*time.Second, "queries should be fast after recovery")
 	})
@@ -285,11 +290,10 @@ func TestScenario05_KafkaBandwidth(t *testing.T) {
 
 	// Configuration
 	const (
-		toxiproxyURL   = "http://localhost:8475"
-		proxyName      = "kafka"
-		kafkaDirectURL = "localhost:9092"
-		kafkaToxiURL   = "localhost:19092"
-		testTopic      = "chaos_test_scenario_05"
+		toxiproxyURL = "http://localhost:8475"
+		proxyName    = "kafka"
+		kafkaToxiURL = "localhost:19092"
+		testTopic    = "chaos_test_scenario_05"
 
 		// Bandwidth limits (KB/s)
 		moderateBandwidth = 500 // 500 KB/s

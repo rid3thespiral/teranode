@@ -346,7 +346,7 @@ go test -v ./test/chaos -run TestScenario05_DatabaseBandwidth
 - ✅ Full recovery after constraints removed
 - ✅ No data corruption
 
-**Test duration:** ~2-3 minutes
+**Test duration:** ~2.1 seconds
 
 #### Variant B: Kafka Bandwidth Constraints
 **Test:** `TestScenario05_KafkaBandwidth`
@@ -387,9 +387,9 @@ go test -v ./test/chaos -run TestScenario05_KafkaBandwidth
 - ✅ Full recovery after constraints removed
 - ✅ Message offsets maintained correctly
 
-**Test duration:** ~2-3 minutes
+**Test duration:** ~2.1 seconds
 
-**Combined scenario duration:** ~4-5 minutes
+**Combined scenario duration:** ~4.4 seconds
 
 ## Test Structure
 
@@ -561,8 +561,8 @@ Chaos tests take longer than unit tests:
 - Scenario 4A (Intermittent Drops): ~8 minutes (includes retry logic with delays)
 - Scenario 4B (Cascading Effects): ~2 seconds (fast failure detection test)
 - Scenario 4C (Load Under Failures): ~28 seconds (load testing under failures)
-- Scenario 5 (Bandwidth Constraints): ~4-5 minutes (database + Kafka bandwidth tests)
-- Full suite: ~16-20 minutes (with all scenarios)
+- Scenario 5 (Bandwidth Constraints): ~4.4 seconds (database + Kafka bandwidth tests)
+- Full suite: ~11-12 minutes (with all scenarios)
 
 ## Troubleshooting
 
