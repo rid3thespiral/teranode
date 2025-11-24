@@ -123,7 +123,7 @@ func TestScenario06_DatabaseSlowClose(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			start := time.Now()
 			var result int
-			err := db.QueryRowContext(ctx, "SELECT pg_sleep(0.1), 1").Scan(&result)
+			err := db.QueryRowContext(ctx, "SELECT 1 FROM pg_sleep(0.1)").Scan(&result)
 			duration := time.Since(start)
 			cancel()
 
