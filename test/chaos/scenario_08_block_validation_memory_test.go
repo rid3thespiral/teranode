@@ -11,6 +11,28 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// ⚠️ IMPLEMENTATION NOTE:
+// This test currently uses SIMULATED/MOCKED block validation functions.
+// To make this a real chaos test, it needs to be integrated with actual Teranode
+// block validation services:
+//
+// TODO: Replace mock implementations with real ones:
+// - Use actual block validation types from services/blockvalidation/
+// - Call real ValidateBlockWithOptions() function
+// - Use real Transaction types and setTxMinedStatus()
+// - Test actual block validation cache
+// - Generate valid Bitcoin block structures
+//
+// Current mock implementations are at the bottom of this file and include:
+// - ValidateSubtreeWithOptions (simulated)
+// - ValidateSubtreeWithCacheStats (simulated)
+// - markTransactionsAsMined (simulated)
+// - BlockSubtree, Transaction types (mock types)
+//
+// This test provides the FRAMEWORK and STRUCTURE for chaos testing block
+// validation under memory pressure, but requires integration work to test
+// real block validation code.
+
 // TestScenario08_BlockValidationMemory tests block validation under memory pressure
 // and various block/subtree patterns
 //
