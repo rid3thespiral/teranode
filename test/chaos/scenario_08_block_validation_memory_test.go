@@ -137,7 +137,7 @@ func TestScenario08_BlockValidationMemory(t *testing.T) {
 		t.Logf("  Goroutines: %d (increased by %d)", goroutinesAfter, goroutineIncrease)
 		t.Logf("  Avg validation time: %v", avgValidationTime)
 
-		require.Less(t, heapAllocMB, int64(maxHeapAllocMB),
+		require.Less(t, int(heapAllocMB), maxHeapAllocMB,
 			"Heap allocation exceeded threshold")
 		require.Less(t, goroutinesAfter, maxGoroutines,
 			"Goroutine count exceeded threshold")
@@ -214,7 +214,7 @@ func TestScenario08_BlockValidationMemory(t *testing.T) {
 		t.Logf("  Avg validation time: %v", avgValidationTime)
 		t.Logf("  Cache hit rate: %.2f%% (%d hits, %d misses)", cacheHitRate, cacheHits, cacheMisses)
 
-		require.Less(t, heapAllocMB, int64(maxHeapAllocMB),
+		require.Less(t, int(heapAllocMB), maxHeapAllocMB,
 			"Heap allocation exceeded threshold")
 		require.Less(t, goroutinesAfter, maxGoroutines,
 			"Goroutine count exceeded threshold")
@@ -290,7 +290,7 @@ func TestScenario08_BlockValidationMemory(t *testing.T) {
 		// No panics should occur
 		require.Equal(t, 0, panicCount, "Panics occurred during validation")
 
-		require.Less(t, heapAllocMB, int64(maxHeapAllocMB),
+		require.Less(t, int(heapAllocMB), maxHeapAllocMB,
 			"Heap allocation exceeded threshold")
 		require.Less(t, goroutinesAfter, maxGoroutines,
 			"Goroutine count exceeded threshold")
