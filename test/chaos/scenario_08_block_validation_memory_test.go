@@ -3,6 +3,7 @@ package chaos
 import (
 	"context"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"runtime"
 	"testing"
@@ -38,16 +39,17 @@ import (
 //
 // Test Scenario:
 // 1. Generate random block subtrees with varying characteristics:
-//    - Transient subtrees (many small blocks, shallow depth)
-//    - Deep chains (stress caching and eviction)
-//    - Mixed patterns (random TX counts, sizes, depths)
+//   - Transient subtrees (many small blocks, shallow depth)
+//   - Deep chains (stress caching and eviction)
+//   - Mixed patterns (random TX counts, sizes, depths)
+//
 // 2. Validate that ValidateBlockWithOptions never panics
 // 3. Verify setTxMinedStatus succeeds for all transactions
 // 4. Monitor performance metrics:
-//    - Heap allocations
-//    - Goroutine count
-//    - Cache hit/miss rates
-//    - Validation times
+//   - Heap allocations
+//   - Goroutine count
+//   - Cache hit/miss rates
+//   - Validation times
 //
 // Expected Behavior:
 // - No panics under any subtree pattern
@@ -64,17 +66,17 @@ func TestScenario08_BlockValidationMemory(t *testing.T) {
 	// Configuration
 	const (
 		// Subtree generation parameters
-		maxTxDepth            = 10   // Maximum transaction chain depth
-		maxTxsPerBlock        = 1000 // Maximum transactions per block
-		maxTxSize             = 10000 // Maximum transaction size in bytes
-		transientBlockCount   = 50    // Number of small/shallow blocks
-		deepChainLength       = 100   // Number of blocks in deep chain
-		mixedPatternCount     = 30    // Number of blocks with mixed patterns
+		maxTxDepth          = 10    // Maximum transaction chain depth
+		maxTxsPerBlock      = 1000  // Maximum transactions per block
+		maxTxSize           = 10000 // Maximum transaction size in bytes
+		transientBlockCount = 50    // Number of small/shallow blocks
+		deepChainLength     = 100   // Number of blocks in deep chain
+		mixedPatternCount   = 30    // Number of blocks with mixed patterns
 
 		// Performance thresholds
-		maxHeapAllocMB        = 500  // Maximum heap allocation in MB
-		maxGoroutines         = 200  // Maximum goroutine count
-		maxValidationTime     = 5 * time.Second // Per-block validation timeout
+		maxHeapAllocMB    = 500             // Maximum heap allocation in MB
+		maxGoroutines     = 200             // Maximum goroutine count
+		maxValidationTime = 5 * time.Second // Per-block validation timeout
 	)
 
 	// Capture baseline metrics
@@ -104,9 +106,9 @@ func TestScenario08_BlockValidationMemory(t *testing.T) {
 		goroutinesBefore := runtime.NumGoroutine()
 
 		generator := NewBlockSubtreeGenerator(SubtreeConfig{
-			MaxTxDepth:     2,               // Shallow depth
-			MaxTxsPerBlock: 10,              // Small blocks
-			MaxTxSize:      1000,            // Small transactions
+			MaxTxDepth:     2,    // Shallow depth
+			MaxTxsPerBlock: 10,   // Small blocks
+			MaxTxSize:      1000, // Small transactions
 		})
 
 		successCount := 0
@@ -174,9 +176,9 @@ func TestScenario08_BlockValidationMemory(t *testing.T) {
 		goroutinesBefore := runtime.NumGoroutine()
 
 		generator := NewBlockSubtreeGenerator(SubtreeConfig{
-			MaxTxDepth:     maxTxDepth,      // Deep chains
-			MaxTxsPerBlock: 100,             // Medium size blocks
-			MaxTxSize:      5000,            // Medium transactions
+			MaxTxDepth:     maxTxDepth, // Deep chains
+			MaxTxsPerBlock: 100,        // Medium size blocks
+			MaxTxSize:      5000,       // Medium transactions
 		})
 
 		successCount := 0
@@ -477,8 +479,8 @@ type ValidationOptions struct {
 }
 
 type ValidationResult struct {
-	Valid      bool
-	CacheHits  int
+	Valid       bool
+	CacheHits   int
 	CacheMisses int
 }
 
@@ -504,7 +506,7 @@ func (g *BlockSubtreeGenerator) GenerateSubtree() (*BlockSubtree, error) {
 	for i := 0; i < txCount; i++ {
 		tx, err := g.generateRandomTransaction()
 		if err != nil {
-			return nil, fmt.Errorf("failed to generate transaction: %w", err)
+			return nil, errors.Join(errors.New("failed to generate transaction"), err)
 		}
 		subtree.Transactions[i] = tx
 	}
@@ -573,7 +575,7 @@ func validateWithPanicRecovery(subtree *BlockSubtree) (valid bool, err error, di
 	defer func() {
 		if r := recover(); r != nil {
 			didPanic = true
-			err = fmt.Errorf("panic recovered: %v", r)
+			err = errors.New(fmt.Sprintf("panic recovered: %v", r))
 		}
 	}()
 
@@ -594,7 +596,7 @@ func markTransactionsAsMined(subtree *BlockSubtree) error {
 	// Simulated setTxMinedStatus logic
 	for i, tx := range subtree.Transactions {
 		if tx == nil {
-			return fmt.Errorf("nil transaction at index %d", i)
+			return errors.New(fmt.Sprintf("nil transaction at index %d", i))
 		}
 		// In real implementation: call setTxMinedStatus
 		tx.Mined = true
