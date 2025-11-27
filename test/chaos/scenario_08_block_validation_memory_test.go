@@ -3,12 +3,12 @@ package chaos
 import (
 	"context"
 	"crypto/rand"
-	"errors"
 	"fmt"
 	"runtime"
 	"testing"
 	"time"
 
+	"github.com/bsv-blockchain/teranode/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -506,7 +506,7 @@ func (g *BlockSubtreeGenerator) GenerateSubtree() (*BlockSubtree, error) {
 	for i := 0; i < txCount; i++ {
 		tx, err := g.generateRandomTransaction()
 		if err != nil {
-			return nil, errors.Join(errors.New("failed to generate transaction"), err)
+			return nil, errors.NewProcessingError("failed to generate transaction: %w", err)
 		}
 		subtree.Transactions[i] = tx
 	}
@@ -575,7 +575,7 @@ func validateWithPanicRecovery(subtree *BlockSubtree) (valid bool, err error, di
 	defer func() {
 		if r := recover(); r != nil {
 			didPanic = true
-			err = errors.New(fmt.Sprintf("panic recovered: %v", r))
+			err = errors.NewProcessingError("panic recovered: %v", r)
 		}
 	}()
 
@@ -596,7 +596,7 @@ func markTransactionsAsMined(subtree *BlockSubtree) error {
 	// Simulated setTxMinedStatus logic
 	for i, tx := range subtree.Transactions {
 		if tx == nil {
-			return errors.New(fmt.Sprintf("nil transaction at index %d", i))
+			return errors.NewProcessingError("nil transaction at index %d", i)
 		}
 		// In real implementation: call setTxMinedStatus
 		tx.Mined = true
