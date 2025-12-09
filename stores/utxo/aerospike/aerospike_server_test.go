@@ -2189,7 +2189,9 @@ func TestDeleteByBin(t *testing.T) {
 	assert.Equal(t, 2, count)
 
 	writePolicy := aerospike.NewWritePolicy(0, 0)
-	// writePolicy.FilterExpression = filterExpression
+	// Note: writePolicy.FilterExpression is not needed here because queryPolicy.FilterExpression
+	// already filters which records are selected for deletion. The writePolicy only controls
+	// how the write operation is applied to the already-filtered record set.
 
 	task, err := client.QueryExecute(queryPolicy, writePolicy, statement, aerospike.DeleteOp())
 	require.NoError(t, err)
