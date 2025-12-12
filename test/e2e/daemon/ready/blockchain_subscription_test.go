@@ -26,11 +26,11 @@ func TestBlockchainSubscriptionReconnection(t *testing.T) {
 	})
 	defer node.Stop(t, true)
 
-	// Subscribe to blockchain notifications
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	// Subscribe to blockchain notifications with a long-lived context
+	subscribeCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	subscriptionCh, err := node.BlockchainClient.Subscribe(ctx, "test-subscription")
+	subscriptionCh, err := node.BlockchainClient.Subscribe(subscribeCtx, "test-subscription")
 	require.NoError(t, err)
 
 	// Helper function to drain notifications and verify we got at least one
@@ -58,7 +58,9 @@ func TestBlockchainSubscriptionReconnection(t *testing.T) {
 	}
 
 	// Get initial block height for verification
-	_, initialMeta, err := node.BlockchainClient.GetBestBlockHeader(ctx)
+	blockCtx, blockCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer blockCancel()
+	_, initialMeta, err := node.BlockchainClient.GetBestBlockHeader(blockCtx)
 	require.NoError(t, err)
 	initialHeight := initialMeta.Height
 
@@ -68,6 +70,8 @@ func TestBlockchainSubscriptionReconnection(t *testing.T) {
 
 	// Wait for block to be fully processed (poll until height increases)
 	require.Eventually(t, func() bool {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
 		_, meta, err := node.BlockchainClient.GetBestBlockHeader(ctx)
 		if err != nil {
 			return false
@@ -82,7 +86,9 @@ func TestBlockchainSubscriptionReconnection(t *testing.T) {
 
 	// Generate more blocks and verify we continue to receive notifications
 	for i := 0; i < 3; i++ {
-		_, currentMeta, err := node.BlockchainClient.GetBestBlockHeader(ctx)
+		currentCtx, currentCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		_, currentMeta, err := node.BlockchainClient.GetBestBlockHeader(currentCtx)
+		currentCancel()
 		require.NoError(t, err)
 		currentHeight := currentMeta.Height
 
@@ -91,6 +97,8 @@ func TestBlockchainSubscriptionReconnection(t *testing.T) {
 
 		// Wait for block to be processed
 		require.Eventually(t, func() bool {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
 			_, meta, err := node.BlockchainClient.GetBestBlockHeader(ctx)
 			if err != nil {
 				return false
