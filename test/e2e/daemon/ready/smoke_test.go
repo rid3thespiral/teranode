@@ -1831,6 +1831,16 @@ func TestBlockManagement(t *testing.T) {
 
 	blockHash := getBlockHashResp.Result
 
+	// Get the initial best block hash before invalidation
+	resp, err = td.CallRPC(td.Ctx, "getbestblockhash", []any{})
+	require.NoError(t, err, "Failed to get best block hash")
+	var initialBestBlockResp helper.GetBestBlockHashResponse
+	err = json.Unmarshal([]byte(resp), &initialBestBlockResp)
+	require.NoError(t, err)
+	initialBestBlock := initialBestBlockResp.Result
+
+	t.Logf("Initial state: best block=%s", initialBestBlock)
+
 	// Test invalidateblock command
 	resp, err = td.CallRPC(td.Ctx, "invalidateblock", []any{blockHash})
 	require.NoError(t, err, "Failed to call invalidateblock")
@@ -1840,11 +1850,34 @@ func TestBlockManagement(t *testing.T) {
 	require.NoError(t, err)
 
 	td.LogJSON(t, "invalidateBlock", invalidateBlockResp)
-
-	// Verify invalidateblock response
 	require.Nil(t, invalidateBlockResp.Error, "Should not have an error")
-	// invalidateblock typically returns null on success
-	t.Logf("invalidateblock completed for block: %s", blockHash)
+
+	// Wait for the blockchain to complete the reorg after invalidation
+	// The best block should change (chain rewinds when we invalidate block at height 2)
+	require.Eventually(t, func() bool {
+		resp, err := td.CallRPC(td.Ctx, "getbestblockhash", []any{})
+		if err != nil {
+			t.Logf("Error getting best block hash: %v", err)
+			return false
+		}
+		var bestBlockResp helper.GetBestBlockHashResponse
+		if err := json.Unmarshal([]byte(resp), &bestBlockResp); err != nil {
+			t.Logf("Error unmarshaling best block response: %v", err)
+			return false
+		}
+		changed := bestBlockResp.Result != initialBestBlock
+		t.Logf("Best block after invalidation: %s (changed: %v)", bestBlockResp.Result, changed)
+		return changed
+	}, 5*time.Second, 100*time.Millisecond, "Blockchain should reorg after block invalidation")
+
+	// Verify the best block changed
+	resp, err = td.CallRPC(td.Ctx, "getbestblockhash", []any{})
+	require.NoError(t, err)
+	var newBestBlockResp helper.GetBestBlockHashResponse
+	err = json.Unmarshal([]byte(resp), &newBestBlockResp)
+	require.NoError(t, err)
+	require.NotEqual(t, initialBestBlock, newBestBlockResp.Result, "Best block should have changed after invalidation")
+	t.Logf("Block invalidated successfully: new best block=%s", newBestBlockResp.Result)
 
 	// Test reconsiderblock command to undo the invalidation
 	resp, err = td.CallRPC(td.Ctx, "reconsiderblock", []any{blockHash})
@@ -1860,11 +1893,34 @@ func TestBlockManagement(t *testing.T) {
 	require.NoError(t, err)
 
 	td.LogJSON(t, "reconsiderBlock", reconsiderBlockResp)
-
-	// Verify reconsiderblock response
 	require.Nil(t, reconsiderBlockResp.Error, "Should not have an error")
-	// reconsiderblock typically returns null on success
-	t.Logf("reconsiderblock completed for block: %s", blockHash)
+
+	// Wait for the blockchain to complete the reorg after reconsideration
+	// The best block should restore to the original
+	require.Eventually(t, func() bool {
+		resp, err := td.CallRPC(td.Ctx, "getbestblockhash", []any{})
+		if err != nil {
+			t.Logf("Error getting best block hash: %v", err)
+			return false
+		}
+		var bestBlockResp helper.GetBestBlockHashResponse
+		if err := json.Unmarshal([]byte(resp), &bestBlockResp); err != nil {
+			t.Logf("Error unmarshaling best block response: %v", err)
+			return false
+		}
+		restored := bestBlockResp.Result == initialBestBlock
+		t.Logf("Best block after reconsideration: %s (restored: %v)", bestBlockResp.Result, restored)
+		return restored
+	}, 5*time.Second, 100*time.Millisecond, "Blockchain should restore to original best block after reconsideration")
+
+	// Verify we're back to the original best block
+	resp, err = td.CallRPC(td.Ctx, "getbestblockhash", []any{})
+	require.NoError(t, err)
+	var finalBestBlockResp helper.GetBestBlockHashResponse
+	err = json.Unmarshal([]byte(resp), &finalBestBlockResp)
+	require.NoError(t, err)
+	require.Equal(t, initialBestBlock, finalBestBlockResp.Result, "Best block should be restored to original after reconsideration")
+	t.Logf("Block reconsidered successfully: restored to best block=%s", finalBestBlockResp.Result)
 }
 
 func TestTransactionPurgeAndSyncConflicting(t *testing.T) {
