@@ -2154,9 +2154,10 @@ func TestAdditionalCoveragePaths(t *testing.T) {
 	t.Run("waitForBestBlockHeaderUpdate coverage", func(t *testing.T) {
 		server, _ := setupServer(t)
 
-		// Test with immediate timeout to cover timeout path
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
-		defer cancel()
+		// Test with pre-cancelled context to reliably cover timeout path
+		// This is more deterministic than using a very short timeout
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel() // Cancel immediately to guarantee the timeout path is taken
 
 		previousHash := chainhash.HashH([]byte("previous"))
 		err := server.waitForBestBlockHeaderUpdate(ctx, &previousHash)
